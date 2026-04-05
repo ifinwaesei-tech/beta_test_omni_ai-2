@@ -1,0 +1,10 @@
+# The .gitignore file
+# Add files still to be ignored as per your project's need
+
+# Example content:
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.db
+*.log
