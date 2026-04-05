@@ -1,10 +1,15 @@
-# The .gitignore file
-# Add files still to be ignored as per your project's need
-
-# Example content:
-*.pyc
 __pycache__/
+*.pyc
 *.pyo
 *.pyd
-*.db
-*.log
+
+.DS_Store
+
+omniai.sqlite-shm
+omniai.sqlite-wal
+.flask_session/
+
+storage/
+browser_images/
+models/
+OmniAIMain/
