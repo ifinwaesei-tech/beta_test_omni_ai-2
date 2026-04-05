@@ -88,12 +88,14 @@ class CursorWrapper:
             else:
                 self._cursor.execute(query)
         except Exception as e:
-            # PostgreSQL doesn't support SQLite PRAGMA statements; clear the failed
-            # transaction state before continuing with the rest of startup.
-            if self._is_postgres and query.strip().upper().startswith("PRAGMA"):
+            if self._is_postgres:
+                # PostgreSQL aborts the whole transaction after any SQL error.
+                # Roll back here so startup migrations that intentionally ignore
+                # failures like "column already exists" can continue safely.
                 self._cursor.connection.rollback()
-            else:
-                raise e
+                if query.strip().upper().startswith("PRAGMA"):
+                    return self
+            raise e
         return self
 
     def fetchone(self):
@@ -297,8 +299,8 @@ class database:
             file_type TEXT NOT NULL,
             chat_code TEXT,
             package_id TEXT,
-            sent BOOLEAN DEFAULT FALSE,
-            active BOOLEAN DEFAULT FALSE,
+            sent BOOLEAN DEFAULT 0,
+            active BOOLEAN DEFAULT 0,
             path TEXT,
             metadata TEXT,
             FOREIGN KEY (user_id) REFERENCES users (id)
